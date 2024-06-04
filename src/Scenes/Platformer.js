@@ -36,7 +36,7 @@ class Platformer extends Phaser.Scene {
         this.backgroundLayer = this.map.createLayer("Background", this.backtileset, 0, 0).setScrollFactor(0.85);
         this.groundLayer = this.map.createLayer("Ground-n-Platforms", this.tileset, 0, 0);
         this.backLayer = this.map.createLayer("Sets-n-Stage", this.tileset, 0, 0);
-        this.lavaLayer = this.map.createLayer("Danger", this.tileset, 0, 0);
+       // this.lavaLayer = this.map.createLayer("Danger", this.tileset, 0, 0);
         //my.sprite.highscore = this.add.bitmapText(170,20, 'cfont', this.score);    
         //my.sprite.highscore.setScale(.8);
         //this.backgroundLayer = this.map.createLayer("Background", this.backtileset, 0, 0).setScrollFactor(0.85);
