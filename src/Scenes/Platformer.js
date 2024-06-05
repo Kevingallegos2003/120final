@@ -24,16 +24,16 @@ class Platformer extends Phaser.Scene {
         this.dhit.push('jump1');this.dhit.push('jump2');this.dhit.push('jump3');
         // Create a new tilemap game object which uses 18x18 pixel tiles, and is
         // 45 tiles wide and 25 tiles tall.
-        this.map = this.add.tilemap("platformer-level-1", 18, 18, 45, 25);
+        this.map = this.add.tilemap("platformer-final", 18, 18, 80, 25);
         
         // Add a tileset to the map
         // First parameter: name we gave the tileset in Tiled
         // Second parameter: key for the tilesheet (from this.load.image in Load.js)
-        this.tileset = this.map.addTilesetImage("kenny_tilemap_packed", "tilemap_tiles");
-        this.backtileset = this.map.addTilesetImage("tilemap-backgrounds_packed", "tilemap_background");
+        this.tileset = this.map.addTilesetImage("tilemap_packed", "tilemap_tiles");
+        //this.backtileset = this.map.addTilesetImage("tilemap_background", "tilemap_background");
 
         // Create a layer
-        this.backgroundLayer = this.map.createLayer("Background", this.backtileset, 0, 0).setScrollFactor(0.85);
+        //this.backgroundLayer = this.map.createLayer("Background", this.backtileset, 0, 0).setScrollFactor(0.85);
         this.groundLayer = this.map.createLayer("Ground-n-Platforms", this.tileset, 0, 0);
         this.backLayer = this.map.createLayer("Sets-n-Stage", this.tileset, 0, 0);
        // this.lavaLayer = this.map.createLayer("Danger", this.tileset, 0, 0);
@@ -44,6 +44,7 @@ class Platformer extends Phaser.Scene {
         my.sprite.highscore.setScale(.3);
         //my.sprite.highscore.startFollow(my.sprite.player, true, 0.25, 0.25);
         // Make it collidable
+        /*
         this.groundLayer.setCollisionByProperty({
             collides: true
         });
@@ -53,6 +54,7 @@ class Platformer extends Phaser.Scene {
         this.lavaLayer.setCollisionByProperty({
             water: false
         });
+        */
         // TODO: Add createFromObjects here
         // Find coins in the "Objects" layer in Phaser
         // Look for them by finding objects with the name "coin"
