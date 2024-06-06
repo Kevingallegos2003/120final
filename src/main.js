@@ -1,13 +1,13 @@
-// Jim Whitehead
-// Created: 4/14/2024
+// Romario Linares & Kevin Gallegos
+// Created: 6/5/2024
 // Phaser: 3.70.0
 //
 // 
 //
 // An example of putting sprites on the screen using Phaser
 // 
-// Art assets from Kenny Assets "Shape Characters" set:
-// https://kenney.nl/assets/shape-characters
+// Art assets from Kenny Assets:
+// https://kenney.nl/assets/pixel-platformer
 
 // debug with extreme prejudice
 "use strict"
@@ -17,7 +17,7 @@ let config = {
     parent: 'phaser-game',
     type: Phaser.CANVAS,
     render: {
-        pixelArt: true  // prevent pixel art from getting blurred when scaled
+        pixelArt: true
     },
     physics: {
         default: 'arcade',
@@ -29,8 +29,8 @@ let config = {
             }
         }
     },
-    width: 1440,
-    height: 900,
+    width: 720,
+    height: 360,
     scene: [Load, Platformer]
 }
 
