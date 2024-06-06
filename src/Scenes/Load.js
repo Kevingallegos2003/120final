@@ -5,8 +5,8 @@ class Load extends Phaser.Scene {
 
     preload() {
         this.load.setPath("./assets/");
-        //sprite loader
-        //this.load.atlas("characters", "tilemap-characters_packed.png", "tilemap-characters-packed.json")
+        //character loader
+        this.load.image("player", "tile_0000.png");
 
         //tilemap loader
         this.load.image("tilemap_tiles", "tilemap_packed.png");
