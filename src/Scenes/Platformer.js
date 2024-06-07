@@ -57,7 +57,7 @@ class Platformer extends Phaser.Scene {
     }
 
     update() {
-        console.log(my.sprite.lbullet.length);
+        //console.log(my.sprite.lbullet.length);
         //bullet creation and movement
         if(Phaser.Input.Keyboard.JustDown(this.space)){
             console.log("bullet press working");
