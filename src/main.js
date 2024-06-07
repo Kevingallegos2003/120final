@@ -4,10 +4,11 @@
 //
 // 
 //
-// An example of putting sprites on the screen using Phaser
+// Final Platform Shooting Wave Game
 // 
 // Art assets from Kenny Assets:
 // https://kenney.nl/assets/pixel-platformer
+// https://kenney.nl/assets/impact-sounds
 
 // debug with extreme prejudice
 "use strict"
@@ -31,7 +32,7 @@ let config = {
     },
     width: 720,
     height: 360,
-    scene: [Load, Platformer]
+    scene: [Title, Load, Platformer, GameOver, Credits]
 }
 
 var cursors;

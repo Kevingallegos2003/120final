@@ -5,8 +5,9 @@ class Load extends Phaser.Scene {
 
     preload() {
         this.load.setPath("./assets/");
-        //character loader
+        //sprite loader
         this.load.image("player", "tile_0000.png");
+        this.load.image("bullet", "tile_0008.png");
 
         //tilemap loader
         this.load.image("tilemap_tiles", "tilemap_packed.png");
@@ -15,11 +16,15 @@ class Load extends Phaser.Scene {
             frameWidth: 16,
             frameHeight: 16
         });
+
+        //audio loader
+        this.load.audio("bulletSound", "footstep_grass_002.ogg");
+        this.load.audio("music", "Voxel Revolution.mp3");
     }
 
     create() {
-        
-         this.scene.start("platformerScene");
+        console.log("loading game...");
+        this.scene.start("platformerScene");
     }
 
     update() {
