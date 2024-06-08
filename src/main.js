@@ -9,6 +9,7 @@
 // Art assets from Kenny Assets:
 // https://kenney.nl/assets/pixel-platformer
 // https://kenney.nl/assets/impact-sounds
+// https://kenney.nl/assets/music-jingles 
 
 // debug with extreme prejudice
 "use strict"
@@ -32,8 +33,8 @@ let config = {
     },
     width: 720,
     height: 360,
-    scene: [Load, Platformer, GameOver, Credits]//change back to bottom version
-    //scene: [Title, Load, Platformer, GameOver, Credits]
+    //scene: [Load, Platformer, GameOver, Credits]//change back to bottom version
+    scene: [Title, Load, Platformer, GameOver, Credits]
 }
 
 var cursors;

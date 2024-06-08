@@ -16,7 +16,8 @@ class Credits extends Phaser.Scene {
     this.credits = this.add.text(200,250, "Assets by Kenney", {fontFamily: "Stencil Std, fantasy", fontSize: 30, fill: "#FFFFFF"});
     const creditsButton = this.add.text(10, 300, "Return", {fontFamily: "Stencil Std, fantasy", fontSize: 30, fill: "#D99D3A"})
         .setInteractive()
-        .on("pointerdown", () => this.scene.start("title"));
+        .on("pointerdown", () => this.scene.start("title"))
+        .on("pointerdown", () => this.sound.play("click"));
     
     }
 

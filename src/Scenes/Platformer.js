@@ -23,6 +23,13 @@ class Platformer extends Phaser.Scene {
         this.possY = [108,72,198,234,108,126,126,216,234,54];
         this.taken = [];
         this.po = 0;
+
+        this.myHealth = 100;
+        this.myScore = 0;
+        this.waves = 1;
+
+        this.footstepSound = this.sound.add("footsteps");
+        this.walking = false;
     }
 
     create() {
@@ -38,12 +45,6 @@ class Platformer extends Phaser.Scene {
         this.tileset = this.map.addTilesetImage("platformer_tilemap", "tilemap_tiles");
         //ground layer
         this.groundLayer = this.map.createLayer("Grounds-n-Platforms", this.tileset, 0, 0);
-        /*
-        //spike layer
-        this.spikeLayer = this.map.createLayer("Spikes", this.tileset, 0, 0);
-        */
-        //I moved the spike layer as the last one rendered so the spikes are layer over the mushroom stems
-        //This can be reverted if u want
         //extra background layer
         this.extraLayer = this.map.createLayer("Extras", this.tileset, 0, 0);
         //spike layer
@@ -55,6 +56,13 @@ class Platformer extends Phaser.Scene {
         //ground collision detection
         this.physics.add.collider(my.sprite.player, this.groundLayer);
         this.groundLayer.setCollisionByProperty({
+            collides: true
+        });
+        //spike collision detection
+        this.physics.add.collider(my.sprite.player, this.spikeLayer, () => {
+            this.myHealth = 0;
+        });
+        this.spikeLayer.setCollisionByProperty({
             collides: true
         });
         //Enemies time -push up to 5 enemies at start -
@@ -81,9 +89,57 @@ class Platformer extends Phaser.Scene {
         this.cameras.main.startFollow(my.sprite.player, true, 0.25, 0.25); 
         this.cameras.main.setDeadzone(50, 50);
         this.cameras.main.setZoom(1.5);
+
+        //hp text
+        this.healthIcon = this.add.sprite(my.sprite.player.x, 50, "health");
+        this.healthText = this.add.text(my.sprite.player.x, 100, this.myHealth, {fontFamily: "Stencil Std, fantasy", fontSize: 10});
+
+        //score text
+        this.scoreIcon = this.add.sprite(my.sprite.player.x, 50, "score");
+        this.scoreText = this.add.text(my.sprite.player.x, 100, this.myScore, {fontFamily: "Stencil Std, fantasy", fontSize: 10});
+
+        this.waveText = this.add.text(my.sprite.player.x, 150, "Wave: " + this.waves, {fontFamily: "Stencil Std, fantasy", fontSize: 20});
+
+        this.physics.world.drawDebug = this.physics.world.drawDebug ? false : true
+        this.physics.world.debugGraphic.clear()
+
+        //walking particle system
+        my.vfx.walking = this.add.particles(0, 0, "kenny-particles", {
+            frame: ["fire_01.png", "fire_02.png"],
+            scale: {start: 0.03, end: 0.04},
+            random: true,
+            lifespan: 400,
+            maxAliveParticles: 15,
+            alpha: {start: 1, end: 0.1},
+            gravityY: -100
+        });
+        my.vfx.walking.stop();
     }
 
     update() {
+        console.log(this.myScore);
+        //UI text that follows player
+        //hp
+        this.healthText.x = my.sprite.player.body.position.x + 10;
+        this.healthText.y = my.sprite.player.body.position.y - 16;
+        this.healthIcon.x = my.sprite.player.body.position.x;
+        this.healthIcon.y = my.sprite.player.body.position.y - 10;
+        //score
+        this.scoreText.x = my.sprite.player.body.position.x + 10;
+        this.scoreText.y = my.sprite.player.body.position.y - 36;
+        this.scoreIcon.x = my.sprite.player.body.position.x;
+        this.scoreIcon.y = my.sprite.player.body.position.y - 30;
+        //wave count
+        this.waveText.x = my.sprite.player.body.position.x - 6;
+        this.waveText.y = my.sprite.player.body.position.y - 60;
+
+        //if player dies, go to game over screen
+        if (this.myHealth <= 0) {
+            this.sound.stopAll();
+            this.sound.play("lose");
+            this.scene.start("gameOver");
+        }
+
         this.num =  Math.floor(Math.random() * 40) + 1;//random number generator
         //console.log(my.sprite.bullet.length);
         //bullet creation and movement
@@ -93,12 +149,14 @@ class Platformer extends Phaser.Scene {
             if(!this.playerfliped){
                 my.sprite.bull= this.physics.add.sprite(my.sprite.player.x, my.sprite.player.y-(my.sprite.player.displayHeight/2),"bullet").setImmovable(true);
                 my.sprite.bull.body.setAllowGravity(false);
+                my.sprite.bull.setScale(0.5);
                 //this.physics.add.collider(my.sprite.bull, this.groundLayer);
                 my.sprite.bullet.push(my.sprite.bull);
             }
             else{
                 my.sprite.bull= this.physics.add.sprite(my.sprite.player.x, my.sprite.player.y-(my.sprite.player.displayHeight/2),"bullet").setImmovable(true);
                 my.sprite.bull.body.setAllowGravity(false);
+                my.sprite.bull.setScale(0.5);
                 my.sprite.lbullet.push(my.sprite.bull);
             }
         }
@@ -117,6 +175,8 @@ class Platformer extends Phaser.Scene {
                     console.log("collides!");
                     bullet.x = 750;
                     enemy.x = 750
+                    this.myScore++;
+                    this.updateScore();
                 }
             }
             for (let bullet of my.sprite.lbullet) {
@@ -124,31 +184,82 @@ class Platformer extends Phaser.Scene {
                     console.log("collides!");
                     bullet.x = -10;
                     enemy.x = 750
+                    this.myScore++;
+                    this.updateScore();
                 }
             }
         }
 
+        for (let enemy of my.sprite.enemies) {
+            if (this.collides(enemy, my.sprite.player)) {
+                console.log("damage taken!");
+                this.myHealth--;
+                this.updateHealth();
+            }
+        }
 
         //trackers for when to remove bullets/enemies from screen
         my.sprite.bullet = my.sprite.bullet.filter((bullet) => bullet.x < 750);
         my.sprite.lbullet = my.sprite.lbullet.filter((bullet) => bullet.x > -10);
         my.sprite.enemies = my.sprite.enemies.filter((enemy) => enemy.x < 750);
+
+        let isMoving = false;
+
         //moving left and right controls
         if(cursors.left.isDown) {
             my.sprite.player.body.setAccelerationX(-this.ACCELERATION);
             my.sprite.player.resetFlip();
             this.playerfliped = true;
+            my.sprite.player.anims.play("walk", true);
+
+            isMoving = true;
+
+            my.vfx.walking.startFollow(my.sprite.player, my.sprite.player.displayWidth/2, my.sprite.player.displayHeight/3, false);
+            my.vfx.walking.setParticleSpeed(this.PARTICLE_VELOCITY, 1);
+            if (my.sprite.player.body.blocked.down) {
+                my.vfx.walking.start();
+            }
         } else if(cursors.right.isDown) {
             my.sprite.player.body.setAccelerationX(this.ACCELERATION);
             my.sprite.player.setFlip(true, false);
             this.playerfliped = false;
+            my.sprite.player.anims.play("walk", true);
+
+            isMoving = true;
+
+            my.vfx.walking.startFollow(my.sprite.player, my.sprite.player.displayWidth-22, my.sprite.player.displayHeight/3, false);
+            my.vfx.walking.setParticleSpeed(this.PARTICLE_VELOCITY, 0);
+            if (my.sprite.player.body.blocked.down) {
+                my.vfx.walking.start();
+            }
         } else {
             my.sprite.player.body.setAccelerationX(0);
             my.sprite.player.body.setDragX(this.DRAG);
+            my.sprite.player.anims.play("idle");
+            my.vfx.walking.stop();
         }
+
+        if (isMoving && !this.walking) {
+            this.footstepSound.play({
+                loop: true,
+                volume: 0.4
+            });
+            this.walking = true; 
+        } else if(!isMoving && this.walking) {
+            this.footstepSound.stop();
+            this.walking = false;
+        }
+
         //jump mechanic
+        if(!my.sprite.player.body.blocked.down) {
+            my.sprite.player.anims.play("jump");
+            my.vfx.walking.stop();
+            this.footstepSound.stop();
+            this.walking = false;
+        }
         if(my.sprite.player.body.blocked.down && Phaser.Input.Keyboard.JustDown(cursors.up)) {
             my.sprite.player.body.setVelocityY(this.JUMP_VELOCITY);
+            this.sound.play("jumpSound", {volume: 0.7});
         }
         //enemy movement WIP
         /*
@@ -163,6 +274,8 @@ class Platformer extends Phaser.Scene {
         else{my.sprite.enemy.body.setAccelerationX(0);}
         */
        if(my.sprite.enemies.length == 0){
+        this.waves++;
+        this.updateWaveText();
         for(var x = 0; x<5;x++){
             this.po = Math.floor(Math.random() * 9) + 1;
             if(this.taken.indexOf(this.po)==-1){
@@ -184,5 +297,18 @@ class Platformer extends Phaser.Scene {
         if (Math.abs(a.y - b.y) > (a.displayHeight/2 + b.displayHeight/2)) return false;
         if (Math.abs(a.x - b.x) > (a.displayHeight/2 + b.displayHeight/2)) return false;
         return true;
+    }
+
+    //score function
+    updateScore() {
+        this.scoreText.setText(this.myScore);
+    }
+    //health function
+    updateHealth() {
+        this.healthText.setText(this.myHealth);
+    }
+
+    updateWaveText() {
+        this.waveText.setText("Wave: " + this.waves);
     }
 }
