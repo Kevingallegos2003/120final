@@ -8,6 +8,7 @@ class Load extends Phaser.Scene {
         //sprite loader
         this.load.image("player", "tile_0000.png");
         this.load.image("bullet", "tile_0008.png");
+        this.load.image("enemy", "tile_0009.png");
 
         //tilemap loader
         this.load.image("tilemap_tiles", "tilemap_packed.png");
