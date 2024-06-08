@@ -162,6 +162,20 @@ class Platformer extends Phaser.Scene {
         }
         else{my.sprite.enemy.body.setAccelerationX(0);}
         */
+       if(my.sprite.enemies.length == 0){
+        for(var x = 0; x<5;x++){
+            this.po = Math.floor(Math.random() * 9) + 1;
+            if(this.taken.indexOf(this.po)==-1){
+                this.taken.push(this.po);
+                my.sprite.enemy = this.physics.add.sprite(this.possX[this.po], this.possY[this.po],"enemy").setScale(this.SCALE);
+                this.physics.add.collider(my.sprite.enemy, this.groundLayer);
+                my.sprite.enemies.push(my.sprite.enemy);
+                //this.physics.add.collider(my.sprite.enemy, this.groundLayer);
+            }
+            
+        }
+        this.taken =[];
+       }
         
     }
     collides(a, b) {//simple collision check
