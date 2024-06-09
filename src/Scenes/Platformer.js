@@ -11,7 +11,7 @@ class Platformer extends Phaser.Scene {
         this.JUMP_VELOCITY = -550;
         this.PARTICLE_VELOCITY = 20;
         this.SCALE = 0.7;
-        //bullet variables
+        //player bullet variables
         this.bulletSpeed = 3.5;
         my.sprite.bullet = [];
         my.sprite.lbullet = [];
@@ -20,12 +20,14 @@ class Platformer extends Phaser.Scene {
         //enemy variables
         my.sprite.flyenemies = [];
         my.sprite.enemies = [];
+        my.sprite.ebullets = [];//for regular enemies, these move on x axis
+        my.sprite.fbullets = [];//for flying enemies, these move on y axis
+        this.maxbullets =6;
         this.possX = [108,306,360,684,684,522,594,234,657,180];
         this.possY = [108,72,198,234,108,126,126,216,234,54];
         this.oobposs = [730,735,745,750,760,755,725,745,735,760]; //X cords for out of bounds spawning for birds
         this.taken = [];
         this.po = 0;
-        this.birdspeed = -5;//used to make bird fly back into scene if they leave
         //player data
         this.myHealth = 100;
         this.myScore = 0;
@@ -131,6 +133,7 @@ class Platformer extends Phaser.Scene {
 
     update() {
         console.log(this.myScore);
+        this.num = Math.floor(Math.random() * 720) + 1;//random number generator used for randomizing bullet shooting from enemies
         //console.log("len "+my.sprite.flyenemies.length);
         //UI text that follows player
         //hp
@@ -156,7 +159,7 @@ class Platformer extends Phaser.Scene {
             //"this.waves-1", feel free to change it!
         }
 
-        this.num =  Math.floor(Math.random() * 40) + 1;//random number generator
+        //this.num =  Math.floor(Math.random() * 40) + 1;//random number generator
         //console.log(my.sprite.bullet.length);
         //bullet creation and movement
         if(Phaser.Input.Keyboard.JustDown(this.space)){
@@ -183,6 +186,19 @@ class Platformer extends Phaser.Scene {
                 bird.x = 740;
                 //if(bird.x > 765){bird.x = 750}
             }
+            if(this.num == Math.floor(bird.x) || this.num == Math.floor(bird.y)){
+                if(my.sprite.fbullets < 8){
+                    //console.log("airdrop");
+                    my.sprite.fbull = this.physics.add.sprite(bird.x, bird.y, "ebullet").setImmovable(true);
+                    my.sprite.fbull.body.setAllowGravity(false);
+                    my.sprite.fbull.setScale(0.5);
+                    my.sprite.fbullets.push(my.sprite.fbull);
+                }
+            }
+        }
+        //flying enemy bullet movement
+        for (let bullet of my.sprite.fbullets) {
+            bullet.y += this.bulletSpeed;
         }
         //bullets appearing on right side
         for (let bullet of my.sprite.bullet) {
@@ -249,8 +265,17 @@ class Platformer extends Phaser.Scene {
                 this.updateHealth();
             }
         }
-
+        //player touches flying bullet
+        for (let bullet of my.sprite.fbullets) {
+            if (this.collides(bullet, my.sprite.player)) {
+                console.log("damage taken!");
+                bullet.y = 735;
+                this.myHealth-=10;
+                this.updateHealth();
+            }
+        }
         //trackers for when to remove bullets/enemies from screen
+        my.sprite.fbullets = my.sprite.fbullets.filter((bullet) => bullet.y < 370);
         my.sprite.bullet = my.sprite.bullet.filter((bullet) => bullet.x < 750);
         my.sprite.lbullet = my.sprite.lbullet.filter((bullet) => bullet.x > -10);
         my.sprite.enemies = my.sprite.enemies.filter((enemy) => enemy.x < 750);

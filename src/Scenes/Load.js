@@ -9,6 +9,7 @@ class Load extends Phaser.Scene {
         this.load.image("player", "tile_0000.png");
         this.load.image("walking", "tile_0001.png");
         this.load.image("bullet", "tile_0007.png");
+        this.load.image("ebullet", "tile_0008.png");
         this.load.image("enemy", "tile_0009.png");
         this.load.image("benemy", "tile_0024.png");
         this.load.image("health", "tile_0044.png");
