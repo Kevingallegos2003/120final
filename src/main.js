@@ -33,8 +33,8 @@ let config = {
     },
     width: 720,
     height: 360,
-    //scene: [Load, Platformer, GameOver, Credits]//change back to bottom version
-    scene: [Title, Load, Platformer, GameOver, Credits]
+    scene: [Load, Platformer, GameOver, Credits]//change back to bottom version
+    //scene: [Title, Load, Platformer, GameOver, Credits]
 }
 
 var cursors;

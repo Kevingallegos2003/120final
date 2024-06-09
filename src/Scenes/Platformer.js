@@ -18,12 +18,15 @@ class Platformer extends Phaser.Scene {
         this.space = null;
         this.playerfliped = false; //Used to know which way to shoot bullet at directions based on which way player faces
         //enemy variables
+        my.sprite.flyenemies = [];
         my.sprite.enemies = [];
         this.possX = [108,306,360,684,684,522,594,234,657,180];
         this.possY = [108,72,198,234,108,126,126,216,234,54];
+        this.oobposs = [730,735,745,750,760,755,725,745,735,760]; //X cords for out of bounds spawning for birds
         this.taken = [];
         this.po = 0;
-
+        this.birdspeed = -5;//used to make bird fly back into scene if they leave
+        //player data
         this.myHealth = 100;
         this.myScore = 0;
         this.waves = 1;
@@ -75,11 +78,21 @@ class Platformer extends Phaser.Scene {
                 my.sprite.enemies.push(my.sprite.enemy);
                 //this.physics.add.collider(my.sprite.enemy, this.groundLayer);
             }
-            
         }
-        
         this.taken =[];
-        //this.physics.add.collider(my.sprite.enemy, this.groundLayer);
+        //FLYING RATS TIME -push up to 5 flying enemies
+        for(var x = 0; x<5;x++){
+            this.po = Math.floor(Math.random() * 9) + 1;
+            if(this.taken.indexOf(this.po)==-1){
+                this.taken.push(this.po);
+                my.sprite.flyenemy = this.physics.add.sprite(this.oobposs[this.po], this.possY[this.po],"benemy").setScale(this.SCALE);
+                my.sprite.flyenemy.body.setImmovable(true);
+                my.sprite.flyenemy.body.setAllowGravity(false);
+                //this.physics.add.collider(my.sprite.enemy, this.groundLayer);
+                my.sprite.flyenemies.push(my.sprite.flyenemy);
+            }
+        }
+        this.taken =[];
 
         //cursor key inputs
         cursors = this.input.keyboard.createCursorKeys();
@@ -118,6 +131,7 @@ class Platformer extends Phaser.Scene {
 
     update() {
         console.log(this.myScore);
+        //console.log("len "+my.sprite.flyenemies.length);
         //UI text that follows player
         //hp
         this.healthText.x = my.sprite.player.body.position.x + 10;
@@ -162,6 +176,14 @@ class Platformer extends Phaser.Scene {
                 my.sprite.lbullet.push(my.sprite.bull);
             }
         }
+        //enemies flying from side to side
+        for(let bird of my.sprite.flyenemies){
+            if(bird.x > -10){bird.x-=2;}
+            else{
+                bird.x = 740;
+                //if(bird.x > 765){bird.x = 750}
+            }
+        }
         //bullets appearing on right side
         for (let bullet of my.sprite.bullet) {
             bullet.x += this.bulletSpeed;
@@ -176,7 +198,7 @@ class Platformer extends Phaser.Scene {
                 if (this.collides(enemy, bullet)) {
                     console.log("collides!");
                     bullet.x = 750;
-                    enemy.x = 750
+                    enemy.x = 750;
                     this.myScore++;
                     this.updateScore();
                 }
@@ -185,14 +207,42 @@ class Platformer extends Phaser.Scene {
                 if (this.collides(enemy, bullet)) {
                     console.log("collides!");
                     bullet.x = -10;
-                    enemy.x = 750
+                    enemy.x = 750;
                     this.myScore++;
                     this.updateScore();
                 }
             }
         }
-
+        //bullet collides with birds
+        for (let enemy of my.sprite.flyenemies) {
+            for (let bullet of my.sprite.bullet) {
+                if (this.collides(enemy, bullet)) {
+                    console.log("collides!");
+                    bullet.x = 750;
+                    enemy.y = -10;
+                    this.myScore++;
+                    this.updateScore();
+                }
+            }
+            for (let bullet of my.sprite.lbullet) {
+                if (this.collides(enemy, bullet)) {
+                    console.log("collides!");
+                    bullet.x = -10;
+                    enemy.y = -10;
+                    this.myScore++;
+                    this.updateScore();
+                }
+            }
+        }
+        //enemy touches player
         for (let enemy of my.sprite.enemies) {
+            if (this.collides(enemy, my.sprite.player)) {
+                console.log("damage taken!");
+                this.myHealth--;
+                this.updateHealth();
+            }
+        }
+        for (let enemy of my.sprite.flyenemies) {
             if (this.collides(enemy, my.sprite.player)) {
                 console.log("damage taken!");
                 this.myHealth--;
@@ -204,6 +254,7 @@ class Platformer extends Phaser.Scene {
         my.sprite.bullet = my.sprite.bullet.filter((bullet) => bullet.x < 750);
         my.sprite.lbullet = my.sprite.lbullet.filter((bullet) => bullet.x > -10);
         my.sprite.enemies = my.sprite.enemies.filter((enemy) => enemy.x < 750);
+        my.sprite.flyenemies = my.sprite.flyenemies.filter((enemy) => enemy.y > 0);
 
         let isMoving = false;
 
@@ -275,7 +326,8 @@ class Platformer extends Phaser.Scene {
         }
         else{my.sprite.enemy.body.setAccelerationX(0);}
         */
-       if(my.sprite.enemies.length == 0){
+       //NEW WAVE
+       if(my.sprite.enemies.length == 0 && my.sprite.flyenemies.length == 0){
         this.waves++;
         this.updateWaveText();
         for(var x = 0; x<5;x++){
@@ -288,6 +340,18 @@ class Platformer extends Phaser.Scene {
                 //this.physics.add.collider(my.sprite.enemy, this.groundLayer);
             }
             
+        }
+        this.taken =[];
+        for(var x = 0; x<5;x++){
+            this.po = Math.floor(Math.random() * 9) + 1;
+            if(this.taken.indexOf(this.po)==-1){
+                this.taken.push(this.po);
+                my.sprite.flyenemy = this.physics.add.sprite(this.oobposs[this.po], this.possY[this.po],"benemy").setScale(this.SCALE);
+                my.sprite.flyenemy.body.setImmovable(true);
+                my.sprite.flyenemy.body.setAllowGravity(false);
+                //this.physics.add.collider(my.sprite.enemy, this.groundLayer);
+                my.sprite.flyenemies.push(my.sprite.flyenemy);
+            }
         }
         this.taken =[];
        }
