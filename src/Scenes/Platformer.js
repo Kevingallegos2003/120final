@@ -137,7 +137,9 @@ class Platformer extends Phaser.Scene {
         if (this.myHealth <= 0) {
             this.sound.stopAll();
             this.sound.play("lose");
-            this.scene.start("gameOver");
+            this.scene.start("gameOver", this.waves-1);//Pass on "this.waves" to gameover scene
+            //Depends on how you would like to decribe it, lets say u die on wave 1, u survived 0 waves due to the above statement,
+            //"this.waves-1", feel free to change it!
         }
 
         this.num =  Math.floor(Math.random() * 40) + 1;//random number generator

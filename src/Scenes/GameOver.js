@@ -9,8 +9,10 @@ class GameOver extends Phaser.Scene {
         this.load.image("laughEnemy", "tile_0012.png");
     }
 
-    create() {
+    create(waves) {
         //still need to figure out how to put your wave count from the previous scene into this
+        this.waves = waves;
+        if(typeof(this.waves)!="number"){this.waves = 0;}//prevents NULL var since it is wonky grabbing zeros for some reason
         this.add.text(50, 50, "You Died! You survived: " + this.waves + " waves", {
             fontFamily: "Stencil Std, fantasy",
             fontSize: 40
