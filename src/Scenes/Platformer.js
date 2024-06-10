@@ -20,7 +20,8 @@ class Platformer extends Phaser.Scene {
         //enemy variables
         my.sprite.flyenemies = [];
         my.sprite.enemies = [];
-        my.sprite.ebullets = [];//for regular enemies, these move on x axis
+        my.sprite.ebulletsL = [];//for regular enemies, these move on x axis
+        my.sprite.ebulletsR = [];//the enemy bullets that shoot right
         my.sprite.fbullets = [];//for flying enemies, these move on y axis
         this.maxbullets =6;
         this.possX = [108,306,360,684,684,522,594,234,657,180];
@@ -196,6 +197,14 @@ class Platformer extends Phaser.Scene {
                 }
             }
         }
+        //ground enemy bullets moving to left
+        for (let bullet of my.sprite.ebulletsR) {
+            bullet.x += this.bulletSpeed;
+        }
+        //ground enemy bullets moving to right
+        for (let bullet of my.sprite.ebulletsL) {
+            bullet.x -= this.bulletSpeed;
+        }
         //flying enemy bullet movement
         for (let bullet of my.sprite.fbullets) {
             bullet.y += this.bulletSpeed;
@@ -265,6 +274,23 @@ class Platformer extends Phaser.Scene {
                 this.updateHealth();
             }
         }
+        //player touches bullet
+        for (let bullet of my.sprite.ebulletsL) {
+            if (this.collides(bullet, my.sprite.player)) {
+                console.log("damage taken!");
+                bullet.y = 735;
+                this.myHealth-=10;
+                this.updateHealth();
+            }
+        }
+        for (let bullet of my.sprite.ebulletsR) {
+            if (this.collides(bullet, my.sprite.player)) {
+                console.log("damage taken!");
+                bullet.y = 735;
+                this.myHealth-=10;
+                this.updateHealth();
+            }
+        }
         //player touches flying bullet
         for (let bullet of my.sprite.fbullets) {
             if (this.collides(bullet, my.sprite.player)) {
@@ -277,6 +303,8 @@ class Platformer extends Phaser.Scene {
         //trackers for when to remove bullets/enemies from screen
         my.sprite.fbullets = my.sprite.fbullets.filter((bullet) => bullet.y < 370);
         my.sprite.bullet = my.sprite.bullet.filter((bullet) => bullet.x < 750);
+        my.sprite.ebulletsR = my.sprite.ebulletsR.filter((bullet) => bullet.x < 750);
+        my.sprite.ebulletsL = my.sprite.ebulletsL.filter((bullet) => bullet.x > -10);
         my.sprite.lbullet = my.sprite.lbullet.filter((bullet) => bullet.x > -10);
         my.sprite.enemies = my.sprite.enemies.filter((enemy) => enemy.x < 750);
         my.sprite.flyenemies = my.sprite.flyenemies.filter((enemy) => enemy.y > 0);
@@ -338,6 +366,35 @@ class Platformer extends Phaser.Scene {
         if(my.sprite.player.body.blocked.down && Phaser.Input.Keyboard.JustDown(cursors.up)) {
             my.sprite.player.body.setVelocityY(this.JUMP_VELOCITY);
             this.sound.play("jumpSound", {volume: 0.7});
+        }
+        //enemy turns to player and attacks them if close enough
+        for (let enemy of my.sprite.enemies) {
+            if(my.sprite.player.x >enemy.x){
+                enemy.setFlipX(true);
+                if(Math.abs(my.sprite.player.x - enemy.x)<= 70 && Math.abs(my.sprite.player.y - enemy.y)<= 35){
+                    this.bpos = Math.floor(Math.random() * 23)+1;
+                    //console.log("Can it attack u?" + this.bpos % 5);
+                    if(this.bpos%6== 0 ){
+                        my.sprite.ebull = this.physics.add.sprite(enemy.x, enemy.y, "ebullet").setImmovable(true);
+                        my.sprite.ebull.body.setAllowGravity(false);
+                        my.sprite.ebull.setScale(0.5);
+                        my.sprite.ebulletsR.push(my.sprite.ebull);
+                    }
+                }
+            }
+            else{
+                enemy.setFlipX(false);
+                if(Math.abs(my.sprite.player.x - enemy.x)<= 60 && Math.abs(my.sprite.player.y - enemy.y)<= 25){
+                    this.bpos = Math.floor(Math.random() * 23)+1;
+                    //console.log("Can it attack u?" + this.bpos % 5);
+                    if(this.bpos% 6 == 0 ){
+                        my.sprite.ebull = this.physics.add.sprite(enemy.x, enemy.y, "ebullet").setImmovable(true);
+                        my.sprite.ebull.body.setAllowGravity(false);
+                        my.sprite.ebull.setScale(0.5);
+                        my.sprite.ebulletsL.push(my.sprite.ebull);
+                    }
+                }
+            }
         }
         //enemy movement WIP
         /*
