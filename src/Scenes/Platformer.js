@@ -88,11 +88,12 @@ class Platformer extends Phaser.Scene {
             this.po = Math.floor(Math.random() * 9) + 1;
             if(this.taken.indexOf(this.po)==-1){
                 this.taken.push(this.po);
-                my.sprite.flyenemy = this.physics.add.sprite(this.oobposs[this.po], this.possY[this.po],"benemy").setScale(this.SCALE);
+                my.sprite.flyenemy = this.physics.add.sprite(this.oobposs[this.po], this.possY[this.po],"benemy").setScale(1);
                 my.sprite.flyenemy.body.setImmovable(true);
                 my.sprite.flyenemy.body.setAllowGravity(false);
                 //this.physics.add.collider(my.sprite.enemy, this.groundLayer);
                 my.sprite.flyenemies.push(my.sprite.flyenemy);
+                my.sprite.flyenemy.anims.play("enemyFly", true);
             }
         }
         this.taken =[];
@@ -221,6 +222,8 @@ class Platformer extends Phaser.Scene {
         for (let enemy of my.sprite.enemies) {
             for (let bullet of my.sprite.bullet) {
                 if (this.collides(enemy, bullet)) {
+                    this.explosion = this.add.sprite(enemy.x, enemy.y, "explosion03").setScale(0.04).play("explosion");
+                    this.sound.play("enemyDie", {volume: 3});
                     console.log("collides!");
                     bullet.x = 750;
                     enemy.x = 750;
@@ -230,6 +233,8 @@ class Platformer extends Phaser.Scene {
             }
             for (let bullet of my.sprite.lbullet) {
                 if (this.collides(enemy, bullet)) {
+                    this.explosion = this.add.sprite(enemy.x, enemy.y, "explosion03").setScale(0.04).play("explosion");
+                    this.sound.play("enemyDie", {volume: 3});
                     console.log("collides!");
                     bullet.x = -10;
                     enemy.x = 750;
@@ -243,19 +248,23 @@ class Platformer extends Phaser.Scene {
             for (let bullet of my.sprite.bullet) {
                 if (this.collides(enemy, bullet)) {
                     console.log("collides!");
+                    this.explosion = this.add.sprite(enemy.x, enemy.y, "explosion03").setScale(0.04).play("explosion");
+                    this.sound.play("enemyDie", {volume: 3});
                     bullet.x = 750;
                     enemy.y = -10;
                     this.myScore++;
-                    this.updateScore();
+                    this.updateScore(); 
                 }
             }
             for (let bullet of my.sprite.lbullet) {
                 if (this.collides(enemy, bullet)) {
                     console.log("collides!");
+                    this.explosion = this.add.sprite(enemy.x, enemy.y, "explosion03").setScale(0.04).play("explosion");
+                    this.sound.play("enemyDie", {volume: 3});
                     bullet.x = -10;
                     enemy.y = -10;
                     this.myScore++;
-                    this.updateScore();
+                    this.updateScore();  
                 }
             }
         }
@@ -428,11 +437,12 @@ class Platformer extends Phaser.Scene {
             this.po = Math.floor(Math.random() * 9) + 1;
             if(this.taken.indexOf(this.po)==-1){
                 this.taken.push(this.po);
-                my.sprite.flyenemy = this.physics.add.sprite(this.oobposs[this.po], this.possY[this.po],"benemy").setScale(this.SCALE);
+                my.sprite.flyenemy = this.physics.add.sprite(this.oobposs[this.po], this.possY[this.po],"benemy").setScale(1);
                 my.sprite.flyenemy.body.setImmovable(true);
                 my.sprite.flyenemy.body.setAllowGravity(false);
                 //this.physics.add.collider(my.sprite.enemy, this.groundLayer);
                 my.sprite.flyenemies.push(my.sprite.flyenemy);
+                my.sprite.flyenemy.anims.play("enemyFly", true);
             }
         }
         this.taken =[];
