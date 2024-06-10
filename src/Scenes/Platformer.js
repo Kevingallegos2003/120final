@@ -357,7 +357,7 @@ class Platformer extends Phaser.Scene {
         if (isMoving && !this.walking) {
             this.footstepSound.play({
                 loop: true,
-                volume: 0.4
+                volume: 0.3
             });
             this.walking = true; 
         } else if(!isMoving && this.walking) {
