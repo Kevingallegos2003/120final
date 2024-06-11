@@ -18,6 +18,7 @@ class Platformer extends Phaser.Scene {
         this.space = null;
         this.playerfliped = false; //Used to know which way to shoot bullet at directions based on which way player faces
         //enemy variables
+        this.emoves = -200; //enemy movement
         my.sprite.flyenemies = [];
         my.sprite.enemies = [];
         my.sprite.ebulletsL = [];//for regular enemies, these move on x axis
@@ -55,12 +56,16 @@ class Platformer extends Phaser.Scene {
         this.extraLayer = this.map.createLayer("Extras", this.tileset, 0, 0);
         //spike layer
         this.spikeLayer = this.map.createLayer("Spikes", this.tileset, 0, 0);
+        //enemy bounds
+        this.boundLayer = this.map.createLayer("Bounds", this.tileset, 0, 0);
+        this.boundLayer.alpha=0; 
 
         //creating player and player collision
         my.sprite.player = this.physics.add.sprite(1, 260, "player").setScale(this.SCALE);
         my.sprite.player.setCollideWorldBounds(true);
         //ground collision detection
         this.physics.add.collider(my.sprite.player, this.groundLayer);
+        //this.physics.add.collider(my.sprite.player, this.boundLayer);
         this.groundLayer.setCollisionByProperty({
             collides: true
         });
@@ -71,6 +76,9 @@ class Platformer extends Phaser.Scene {
         this.spikeLayer.setCollisionByProperty({
             collides: true
         });
+        this.boundLayer.setCollisionByProperty({
+            collides: true
+        });
         //Enemies time -push up to 5 enemies at start -
         for(var x = 0; x<5;x++){
             this.po = Math.floor(Math.random() * 9) + 1;
@@ -78,6 +86,10 @@ class Platformer extends Phaser.Scene {
                 this.taken.push(this.po);
                 my.sprite.enemy = this.physics.add.sprite(this.possX[this.po], this.possY[this.po],"enemy").setScale(this.SCALE);
                 this.physics.add.collider(my.sprite.enemy, this.groundLayer);
+                this.physics.add.collider(my.sprite.enemy, this.boundLayer);
+                //give each enemy a 2 bools used later to detect bounds
+                my.sprite.enemy.le =false;//unorthadox name since testing, but it worked!
+                my.sprite.enemy.re =false;//too bad i got lazy to change it though
                 my.sprite.enemies.push(my.sprite.enemy);
                 //this.physics.add.collider(my.sprite.enemy, this.groundLayer);
             }
@@ -405,18 +417,14 @@ class Platformer extends Phaser.Scene {
                 }
             }
         }
-        //enemy movement WIP
-        /*
-        if(this.num % 2){
-            this.steps = this.num;
-            for(this.steps; this.steps>0; this.steps--){my.sprite.enemy.body.setAccelerationX(5);}
+        //enemy movement (most scuffed but it works!!)
+        for (let enemy of my.sprite.enemies) {
+            if(enemy.le == false && enemy.re == false){enemy.body.setAccelerationX(this.emoves);}
+            if(enemy.le == true && enemy.re == false){enemy.body.setAccelerationX(this.emoves*-1);}
+            if(enemy.le == false && enemy.re == true){enemy.body.setAccelerationX(this.emoves);}
+            if(enemy.body.blocked.left){enemy.le = true;enemy.re = false;}
+            if(enemy.body.blocked.right){enemy.re = true;enemy.le = false;}
         }
-        else if(this.num % 3){
-            this.steps = this.num;
-            for(this.steps; this.steps > 0; this.steps--){my.sprite.enemy.body.setAccelerationX(-5);}
-        }
-        else{my.sprite.enemy.body.setAccelerationX(0);}
-        */
        //NEW WAVE
        if(my.sprite.enemies.length == 0 && my.sprite.flyenemies.length == 0){
         this.waves++;
@@ -427,6 +435,9 @@ class Platformer extends Phaser.Scene {
                 this.taken.push(this.po);
                 my.sprite.enemy = this.physics.add.sprite(this.possX[this.po], this.possY[this.po],"enemy").setScale(this.SCALE);
                 this.physics.add.collider(my.sprite.enemy, this.groundLayer);
+                this.physics.add.collider(my.sprite.enemy, this.boundLayer);
+                my.sprite.enemy.le =false;
+                my.sprite.enemy.re =false;
                 my.sprite.enemies.push(my.sprite.enemy);
                 //this.physics.add.collider(my.sprite.enemy, this.groundLayer);
             }
